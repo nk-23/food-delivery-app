@@ -29,8 +29,23 @@ The trained model is saved to:
 models/customer-behavior-model.json
 ```
 
+Advanced outputs:
+- `discountResponseProbability`: probability that each customer responds to a discount.
+- `churnRisk`: estimated risk from recency, low app engagement, cancellations, late deliveries, and support tickets.
+- `estimatedMonthlyValue`: simple customer value estimate from order value and monthly order count.
+- `segment`: business segment such as `Deal loyalist`, `Premium regular`, `At-risk customer`, or `High-intent browser`.
+- `campaign`: recommended next-best action, offer type, message, and channel.
+- `segmentSummary`: customer counts by segment.
+- `featureImportance`: model weights sorted by strongest influence.
+
 How the app can use it:
 - Show `GET150` or combo offers to customers with high predicted discount response.
 - Show premium restaurant recommendations to low discount-response customers.
 - Identify customers at risk of inactivity using high `days_since_last_order`.
 - Improve discount spending by targeting customers who actually react to offers.
+
+Advanced campaign ideas:
+- Use `Deal loyalist` customers for ₹150 meal bundles, BOGO offers, and ONDC/Magicpin value prompts.
+- Use `Premium regular` customers for high-rated restaurants, loyalty points, and faster delivery slots instead of deep coupons.
+- Use `At-risk customer` customers for win-back coupons and apology credits after late deliveries.
+- Use `High-intent browser` customers for cart nudges, delivery-fee waivers, and limited-time lunch offers.
