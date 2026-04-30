@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
+  BadgePercent,
   Bike,
   ChefHat,
   ChevronRight,
@@ -166,8 +167,44 @@ const categories = ['All', 'Indian', 'Japanese', 'Healthy', 'Italian', 'Mexican'
 const navItems = [
   { id: 'home', label: 'Home', icon: Home },
   { id: 'restaurants', label: 'Restaurants', icon: Store },
+  { id: 'discounts', label: 'Discounts', icon: BadgePercent },
   { id: 'riders', label: 'Delivery Guys', icon: Bike },
   { id: 'track', label: 'Track Order', icon: Navigation },
+];
+
+const discountPrompts = ['Flat 50% Off', '60% Off', 'Combos for 1', 'Buy 1 Get 1', 'Low to High'];
+const promoCodes = [
+  { app: 'Zomato', code: 'GET150', offer: 'Flat discount on select restaurants', note: 'Check minimum order before checkout' },
+  { app: 'Zomato', code: 'HUNGRY50', offer: 'Up to 50% off', note: 'Pair with 4.0+ rated restaurants' },
+  { app: 'Swiggy', code: 'WELCOME50', offer: 'New account savings', note: 'Works best when delivery fee is low' },
+  { app: 'Swiggy', code: 'SWIGGYIT', offer: 'Up to 50% off', note: 'Look for Swiggy One tags to save delivery fees' },
+];
+const valueAlternatives = [
+  {
+    name: 'ONDC',
+    channel: 'Magicpin or Pincode',
+    saving: 'Often ₹50-₹100 cheaper',
+    detail: 'Lower restaurant commissions can mean base-menu pricing on standard meals.',
+  },
+  {
+    name: 'EatSure',
+    channel: 'Faasos, Behrouz, Oven Story',
+    saving: 'Good for BOGO meals',
+    detail: 'Mix brands in one order and watch for no-surge delivery windows.',
+  },
+  {
+    name: 'Magicpin',
+    channel: 'Vouchers and Magic Points',
+    saving: 'Useful for ₹150 targets',
+    detail: 'Stack delivery deals with vouchers to bring a ₹200 meal closer to budget.',
+  },
+];
+const budgetFinds = [
+  { id: 'paneer-roll', name: 'Paneer Kathi Roll', source: 'Tandoor Lane', price: 179, dealPrice: 150, tag: '50% deal target' },
+  { id: 'green-smoothie', name: 'Glow Smoothie', source: 'Verde Kitchen', price: 149, dealPrice: 149, tag: 'Already under target' },
+  { id: 'elote-cup', name: 'Street Corn Cup', source: 'Birria Bros', price: 129, dealPrice: 129, tag: 'Combo add-on' },
+  { id: 'loaded-fries', name: 'Loaded Fries', source: 'Burger Foundry', price: 139, dealPrice: 139, tag: 'Low to high' },
+  { id: 'choco-shake', name: 'Chocolate Shake', source: 'Sweet Spoon', price: 139, dealPrice: 139, tag: 'Snack hour' },
 ];
 
 const trackingSteps = [
@@ -238,6 +275,15 @@ function App() {
             query={query}
             setQuery={setQuery}
             restaurants={filteredRestaurants}
+            updateCart={updateCart}
+          />
+        )}
+
+        {activePage === 'discounts' && (
+          <DiscountsPage
+            setActivePage={setActivePage}
+            setQuery={setQuery}
+            setActiveCategory={setActiveCategory}
             updateCart={updateCart}
           />
         )}
@@ -351,6 +397,17 @@ function HomePage(props) {
 
       <StatsBand />
 
+      <section className="savings-strip">
+        <div>
+          <strong>Find ₹150 meals faster</strong>
+          <span>Use discount-first searches, combos, and low-fee windows.</span>
+        </div>
+        <button type="button" onClick={() => setActivePage('discounts')}>
+          <BadgePercent size={18} />
+          Open discounts
+        </button>
+      </section>
+
       <SectionHeading title="Nearby restaurants" subtitle={`${visibleRestaurants.length} kitchens delivering now`}>
         <button type="button" onClick={() => setActivePage('restaurants')}>See all</button>
       </SectionHeading>
@@ -358,6 +415,127 @@ function HomePage(props) {
 
       <SectionHeading title="Popular dishes" subtitle="Quick add favorites from every menu" className="popular-heading" />
       <DishList items={menuItems.slice(0, 8)} updateCart={updateCart} />
+    </>
+  );
+}
+
+function DiscountsPage({ setActivePage, setQuery, setActiveCategory, updateCart }) {
+  const applyPrompt = (prompt) => {
+    setQuery(prompt);
+    setActiveCategory('All');
+    setActivePage('restaurants');
+  };
+
+  return (
+    <>
+      <PageHeader
+        icon={BadgePercent}
+        title="Discount Finder"
+        description="Search by offer first, sort for low prices, and spot meals that can land near ₹150."
+      />
+
+      <section className="discount-hero">
+        <div>
+          <span className="tag">Smart prompting</span>
+          <h2>Start with the discount, then choose the dish.</h2>
+          <p>Try high-value keywords, keep ratings above 4.0, and check low-to-high prices before opening a menu.</p>
+        </div>
+        <div className="prompt-grid">
+          {discountPrompts.map((prompt) => (
+            <button type="button" key={prompt} onClick={() => applyPrompt(prompt)}>
+              <Search size={17} />
+              {prompt}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="discount-grid">
+        <article className="discount-panel">
+          <div className="panel-title">
+            <BadgePercent size={21} />
+            <div>
+              <h2>Promo watchlist</h2>
+              <p>Check availability and minimum order in the delivery app.</p>
+            </div>
+          </div>
+          <div className="promo-list">
+            {promoCodes.map((promo) => (
+              <div className="promo-code-card" key={`${promo.app}-${promo.code}`}>
+                <span>{promo.app}</span>
+                <strong>{promo.code}</strong>
+                <p>{promo.offer}</p>
+                <small>{promo.note}</small>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="discount-panel">
+          <div className="panel-title">
+            <WalletCards size={21} />
+            <div>
+              <h2>₹150 gems</h2>
+              <p>Quick picks and combo-friendly items.</p>
+            </div>
+          </div>
+          <div className="budget-list">
+            {budgetFinds.map((item) => (
+              <div className="budget-row" key={item.name}>
+                <div>
+                  <strong>{item.name}</strong>
+                  <span>{item.source} · {item.tag}</span>
+                </div>
+                <div className="budget-price">
+                  <small>{formatMoney(item.price)}</small>
+                  <b>{formatMoney(item.dealPrice)}</b>
+                </div>
+                <button type="button" onClick={() => updateCart(item.id, 1)} aria-label={`Add ${item.name}`}>
+                  <Plus size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </article>
+      </section>
+
+      <section className="alternatives-panel">
+        <div className="panel-title">
+          <Store size={21} />
+          <div>
+            <h2>Better value alternatives</h2>
+            <p>Compare direct-to-consumer and open-network options before ordering.</p>
+          </div>
+        </div>
+        <div className="alternative-list">
+          {valueAlternatives.map((option) => (
+            <article className="alternative-card" key={option.name}>
+              <span>{option.channel}</span>
+              <h3>{option.name}</h3>
+              <strong>{option.saving}</strong>
+              <p>{option.detail}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="tips-grid">
+        <article>
+          <Clock3 size={22} />
+          <h3>Time it right</h3>
+          <p>Happy-hour windows around 2 PM to 5 PM often make snack orders cheaper with lower delivery fees.</p>
+        </article>
+        <article>
+          <Store size={22} />
+          <h3>Check combos</h3>
+          <p>Open “Combos for 1” and lunch-box sections for wraps, thalis, and mini meals around ₹129 to ₹149.</p>
+        </article>
+        <article>
+          <MapPin size={22} />
+          <h3>Local tiffins</h3>
+          <p>For Noida Sector 130, add tiffin services to your shortlist when you want healthier meals near ₹100 to ₹130.</p>
+        </article>
+      </section>
     </>
   );
 }
