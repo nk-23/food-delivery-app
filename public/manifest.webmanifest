@@ -1,0 +1,26 @@
+{
+  "name": "Crave Courier",
+  "short_name": "Crave",
+  "description": "Food delivery, discounts, delivery partners, and live order tracking.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f7f5ef",
+  "theme_color": "#0c7a5a",
+  "categories": ["food", "shopping", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/apple-touch-icon.svg",
+      "sizes": "180x180",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
